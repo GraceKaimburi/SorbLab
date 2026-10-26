@@ -29,18 +29,89 @@
 
   <main> <!-- the main content of the page -->
     <h1>Adsorption assistant</h1> <!-- the page title -->
-    <p class="lead">Ask how strongly CO&#8322;, CO or SO&#8322; sticks to a metal surface. You get the calculated energy, a plain explanation, and the simulation files to reproduce it.</p> <!-- one sentence saying what the tool does -->
+    <p class="lead">Pick a metal, look at its surface in 3D, then pick a gas. You get the calculated energy, a plain explanation, and the simulation files to reproduce it.</p> <!-- one sentence saying what to do -->
 
-    <form class="ask" id="ask-form" autocomplete="off"> <!-- the question form -->
-      <input id="question" type="text" maxlength="500" placeholder="For example: How strongly does SO2 stick to calcium?" aria-label="Your question" required> <!-- the box where the question is typed -->
+    <form class="ask" id="ask-form" autocomplete="off"> <!-- the optional question form, a shortcut for people who prefer typing -->
+      <input id="question" type="text" maxlength="500" placeholder="Or ask in words, like: SO2 on calcium" aria-label="Ask in words" required> <!-- the box where the question is typed -->
       <button class="btn" id="ask-btn" type="submit"><svg class="icon" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2L17 17"/></svg><span>Ask</span></button> <!-- the submit button with a magnifying glass -->
     </form> <!-- end of the form -->
     <div class="examples" id="examples"></div> <!-- example questions are placed here by the script -->
     <div id="recent"></div> <!-- the last few questions are placed here by the script -->
-    <div id="status" role="status" aria-live="polite"></div> <!-- progress messages, read aloud by screen readers -->
 
-    <div id="output" hidden></div> <!-- the answer panels appear here -->
-    <noscript><p class="panel">This page needs JavaScript to answer questions. The <a href="results.html">results page</a> works without it.</p></noscript> <!-- a message for visitors with scripts turned off -->
+    <ol class="flow" id="flow"> <!-- the four steps, one under the other -->
+      <li class="fstep" id="s1"> <!-- step one, choosing a metal -->
+        <div class="fnum">1</div> <!-- the step number in a circle -->
+        <div class="fbody"> <!-- the content of the step -->
+          <h2>Choose a metal</h2> <!-- the step title -->
+          <p class="muted" id="s1-sum">Twelve metals have calculated results. Dashed tiles only get a model estimate.</p> <!-- a line that updates after a choice -->
+          <div class="ptable" id="ptable" role="group" aria-label="Metals"></div> <!-- the mini periodic table is drawn here by the script -->
+          <p class="muted keyline"><span class="key solid"></span> calculated <span class="key dashed"></span> estimate only</p> <!-- explains the two tile styles -->
+        </div> <!-- end of step content -->
+      </li> <!-- end of step one -->
+
+      <li class="fstep locked" id="s2"> <!-- step two, looking at the surface -->
+        <div class="fnum">2</div> <!-- the step number -->
+        <div class="fbody"> <!-- the content of the step -->
+          <h2>Look at the surface and pick a spot</h2> <!-- the step title -->
+          <p class="muted" id="s2-sum">Choose a metal first.</p> <!-- a line that updates after a choice -->
+          <div id="s2-body" hidden> <!-- shown once a metal is chosen -->
+            <div class="vwrap"> <!-- the viewer and its tools -->
+              <canvas id="cv-slab" class="vcanvas" tabindex="0" role="img" aria-label="3D view of the metal surface. Drag to rotate, click a ringed atom to choose where the gas lands."></canvas> <!-- the 3D drawing surface -->
+              <div class="vtools" role="toolbar" aria-label="View controls"> <!-- the buttons that control the view -->
+                <button type="button" class="chip" data-v="angle">Angle</button> <!-- a three quarter view -->
+                <button type="button" class="chip" data-v="top">Top</button> <!-- looking straight down -->
+                <button type="button" class="chip" data-v="side">Side</button> <!-- looking from the side to count layers -->
+                <button type="button" class="chip" data-v="in" aria-label="Zoom in">+</button> <!-- zoom in -->
+                <button type="button" class="chip" data-v="out" aria-label="Zoom out">&minus;</button> <!-- zoom out -->
+                <button type="button" class="chip" data-v="spin" aria-pressed="false">Spin</button> <!-- slow automatic turning -->
+              </div> <!-- end of the buttons -->
+            </div> <!-- end of the viewer -->
+            <p class="muted" id="slab-info"></p> <!-- facts about the shown surface -->
+            <p class="muted">Drag to rotate. Click a ringed atom on the top layer to choose where the gas lands. All top atoms are equivalent, so the energy is the same wherever you click.</p> <!-- how to use the viewer -->
+            <div class="sites"> <!-- the kinds of landing spot -->
+              <span class="muted">Spot type:</span> <!-- label -->
+              <button type="button" class="chip on" aria-pressed="true">Top atom</button> <!-- the one that was calculated -->
+              <button type="button" class="chip" disabled title="Not calculated yet">Bridge</button> <!-- between two atoms, not done -->
+              <button type="button" class="chip" disabled title="Not calculated yet">Hollow</button> <!-- between three atoms, not done -->
+            </div> <!-- end of spot types -->
+            <button type="button" class="btn primary" id="s2-next">Next: choose a gas</button> <!-- moves down to step three -->
+          </div> <!-- end of the shown part -->
+        </div> <!-- end of step content -->
+      </li> <!-- end of step two -->
+
+      <li class="fstep locked" id="s3"> <!-- step three, choosing a gas -->
+        <div class="fnum">3</div> <!-- the step number -->
+        <div class="fbody"> <!-- the content of the step -->
+          <h2>Choose a gas</h2> <!-- the step title -->
+          <p class="muted" id="s3-sum">Choose a metal first.</p> <!-- a line that updates after a choice -->
+          <div class="gascards" id="gascards"></div> <!-- three molecule cards are drawn here by the script -->
+        </div> <!-- end of step content -->
+      </li> <!-- end of step three -->
+
+      <li class="fstep locked" id="s4"> <!-- step four, the result -->
+        <div class="fnum">4</div> <!-- the step number -->
+        <div class="fbody"> <!-- the content of the step -->
+          <h2>Check the system and read the result</h2> <!-- the step title -->
+          <div id="status" role="status" aria-live="polite"></div> <!-- progress messages, read aloud by screen readers -->
+          <div id="sysview" hidden> <!-- the 3D picture of the calculation, shown for single answers -->
+            <div class="vwrap"> <!-- the viewer and its tools -->
+              <canvas id="cv-sys" class="vcanvas" tabindex="0" role="img" aria-label="3D view of the gas above the metal surface as used in the calculation."></canvas> <!-- the 3D drawing surface -->
+              <div class="vtools" role="toolbar" aria-label="View controls"> <!-- the buttons that control the view -->
+                <button type="button" class="chip" data-v="angle">Angle</button> <!-- a three quarter view -->
+                <button type="button" class="chip" data-v="top">Top</button> <!-- looking straight down -->
+                <button type="button" class="chip" data-v="side">Side</button> <!-- looking from the side -->
+                <button type="button" class="chip" data-v="in" aria-label="Zoom in">+</button> <!-- zoom in -->
+                <button type="button" class="chip" data-v="out" aria-label="Zoom out">&minus;</button> <!-- zoom out -->
+                <button type="button" class="chip" data-v="spin" aria-pressed="false">Spin</button> <!-- slow automatic turning -->
+              </div> <!-- end of the buttons -->
+            </div> <!-- end of the viewer -->
+            <p class="muted" id="sys-info"></p> <!-- what the picture shows -->
+          </div> <!-- end of the system view -->
+          <div id="output" hidden></div> <!-- the answer panels appear here -->
+        </div> <!-- end of step content -->
+      </li> <!-- end of step four -->
+    </ol> <!-- end of the steps -->
+    <noscript><p class="panel">This page needs JavaScript. The <a href="results.html">results page</a> works without it.</p></noscript> <!-- a message for visitors with scripts turned off -->
   </main> <!-- end of the main content -->
 
   <footer class="site-footer"> <!-- the page footer -->

@@ -197,3 +197,60 @@ code { font: 13px ui-monospace, Consolas, monospace; background: var(--code-bg);
 .controls select { font: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--text); } /* a select box */
 .tablewrap { overflow-x: auto; } /* wide tables scroll sideways on small screens instead of breaking the layout */
 .warnmark { color: #c98500; display: inline-flex; vertical-align: middle; cursor: help; } /* the caution icon next to a flagged value */
+
+.flow { list-style: none; margin: 20px 0 0; padding: 0; } /* the four steps stacked, with no bullets */
+.fstep { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 20px 0; border-top: 1px solid var(--line); } /* one step, number on the left and content on the right */
+.fnum { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 650; font-size: 15px; } /* the numbered circle */
+.fstep.done .fnum { background: var(--accent); color: var(--accent-ink); } /* a finished step is filled in */
+.fstep.locked .fnum { border-color: var(--line-2); color: var(--text-3); } /* a step not yet available is grey */
+.fstep.locked h2 { color: var(--text-3); } /* its title is grey too */
+.fstep.locked .muted { color: var(--text-3); } /* and its hint */
+.fstep h2 { margin: 4px 0 4px; } /* step title spacing */
+.fbody { min-width: 0; } /* lets wide content shrink instead of pushing the page sideways */
+
+.ptable { display: grid; grid-template-columns: 52px repeat(5, minmax(44px, 62px)); gap: 6px; margin: 12px 0 8px; align-items: stretch; } /* the mini periodic table, one label column and five element columns */
+.ptable .hd { font-size: 11px; color: var(--text-3); text-align: center; align-self: end; line-height: 1.2; padding-bottom: 2px; } /* group labels above the columns */
+.ptable .rl { font-size: 11px; color: var(--text-3); align-self: center; } /* period labels beside the rows */
+.tile { font: inherit; display: grid; place-items: center; gap: 0; padding: 6px 2px; min-height: 52px; background: var(--surface); color: var(--text); border: 1px solid var(--line-2); border-radius: 4px; cursor: pointer; } /* one element tile */
+.tile b { font-size: 16px; line-height: 1.1; } /* the element symbol */
+.tile small { font-size: 10px; color: var(--text-2); line-height: 1.1; } /* the element name under the symbol */
+.tile:hover { border-color: var(--accent); } /* feedback on hover */
+.tile.est { border-style: dashed; } /* estimate only elements have a dashed edge */
+.tile.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); } /* the chosen element is filled with the accent colour */
+.tile.on small { color: var(--accent-ink); } /* keep the name readable on the filled tile */
+.keyline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } /* the small key under the table */
+.key { width: 22px; height: 14px; border: 1px solid var(--line-2); border-radius: 3px; display: inline-block; } /* a sample tile edge */
+.key.dashed { border-style: dashed; margin-left: 10px; } /* the dashed sample */
+
+.vwrap { position: relative; } /* lets the tool buttons sit on top of the drawing */
+.vcanvas { width: 100%; aspect-ratio: 16 / 9; display: block; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; cursor: grab; touch-action: pan-y; } /* the 3D drawing surface, vertical page scrolling still works on touch screens */
+.vcanvas:active { cursor: grabbing; } /* closed hand while dragging */
+.vtools { position: absolute; left: 8px; bottom: 8px; display: flex; flex-wrap: wrap; gap: 6px; } /* the control buttons sit in the bottom corner */
+.chip { font: inherit; font-size: 13px; padding: 4px 10px; background: var(--surface); color: var(--text-2); border: 1px solid var(--line-2); border-radius: 14px; cursor: pointer; } /* a small round button */
+.chip:hover:not(:disabled) { color: var(--text); border-color: var(--text-3); } /* feedback on hover */
+.chip.on, .chip[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); font-weight: 600; } /* a switched on button */
+.chip:disabled { opacity: 0.5; cursor: not-allowed; } /* a spot type that is not available */
+.sites { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 12px; } /* the row of spot types */
+
+.gascards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; } /* three gas cards side by side */
+.gcard { font: inherit; text-align: left; padding: 8px 8px 12px; background: var(--surface); color: var(--text); border: 1px solid var(--line-2); border-radius: 6px; cursor: pointer; display: grid; gap: 4px; } /* one gas card */
+.gcard canvas { width: 100%; aspect-ratio: 4 / 3; display: block; background: var(--code-bg); border-radius: 4px; } /* the small molecule drawing */
+.gcard b { font-size: 16px; margin-top: 4px; } /* the gas name */
+.gcard span { font-size: 13px; color: var(--text-2); } /* the gas note */
+.gcard:hover { border-color: var(--accent); } /* feedback on hover */
+.gcard.on { border: 2px solid var(--accent); padding: 7px 7px 11px; } /* the chosen gas has a strong edge without shifting the layout */
+.gcard:disabled { opacity: 0.55; cursor: not-allowed; } /* before a metal is chosen */
+
+#sysview { margin-bottom: 16px; } /* space between the picture and the answer panels */
+.fbody .panel:first-child { margin-top: 12px; } /* space under the step heading */
+
+@media (max-width: 600px) { /* small screens */
+  .fstep { grid-template-columns: 1fr; gap: 6px; } /* put the number above the content */
+  .gascards { grid-template-columns: 1fr; } /* one gas card per row */
+  .gcard { grid-template-columns: 110px 1fr; align-items: center; } /* the picture beside the words */
+  .gcard canvas { grid-row: 1 / span 2; } /* the picture spans both text lines */
+  .gcard b { margin-top: 0; align-self: end; } /* tidy spacing in the row layout */
+  .gcard span { align-self: start; } /* the note sits under the name */
+  .vcanvas { aspect-ratio: 4 / 3; } /* a taller drawing on phones */
+  .ptable { grid-template-columns: 40px repeat(5, minmax(0, 1fr)); gap: 4px; } /* a tighter table that fits a phone */
+}

@@ -8,7 +8,8 @@ Built for MaterialsGPT Africa, Track 03: connect a language model to physics bas
 
 ## What it does
 
-1. Reads a question such as "How strongly does SO2 stick to calcium?". A language model does the reading when a key is set. A built in reader does it otherwise.
+0. A visual picker: choose a metal on a mini periodic table, turn the real surface in 3D (drag, Top and Side views, click a top atom), choose a gas, then see the gas above the surface as used in the calculation. Atoms are read from the generated input files, so the picture is the calculation.
+1. Or reads a question such as "How strongly does SO2 stick to calcium?". A language model does the reading when a key is set. A built in reader does it otherwise.
 2. Looks up the result in a table of 36 DFT calculations (12 metals and 3 gases: CO2, CO, SO2).
 3. For a metal with no calculation (Cs, Ba, Zn, Cd, Tl) it gives a clearly labelled estimate from a small ridge regression on electronegativity and atom size. The Results page shows how wrong that model usually is.
 4. Writes a short explanation. The language model may only use numbers it was given. The server rejects any reply with an invented number.
@@ -27,6 +28,7 @@ The numbers are PBE, no dispersion correction, clean metal slabs, gas placed at 
 | js/data.js | Results, metal properties, settings |
 | js/engine.js | Question reader, lookup, surrogate model, explanations, input bundles |
 | js/app.js, js/results.js | Page logic |
+| js/viewer.js, js/structures.js | The 3D atom viewer (plain canvas, no library) and the code that reads atom positions from the input files |
 | js/chart.js, js/zip.js, js/icons.js, js/theme.js | Chart, zip writer, icons, theme switch |
 | js/inputs.js | Generated input files (made by scripts/make_inputs.py) |
 | api/ask.js | Server function that calls the language model and checks its reply |

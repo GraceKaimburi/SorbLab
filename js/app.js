@@ -7,6 +7,8 @@ import { barChart } from './chart.js'; // the bar chart drawing
 import { makeZip } from './zip.js'; // builds a zip of the input files
 import { ICONS } from './icons.js'; // the line icons
 import { initTheme } from './theme.js'; // the light and dark switch
+import { Viewer, slabScene, systemScene, gasScene } from './viewer.js'; // the 3D atom viewer and its scene builders
+import { getSlab, getGas, getSystem } from './structures.js'; // real atom positions read from the input files
 
 const $ = (id) => document.getElementById(id); // short helper to find an element by its id
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); // makes any text safe to put inside HTML
@@ -61,7 +63,7 @@ function understood(req, source) { // the small table that shows how the questio
   if (req.elements.length) rows.push(['Metal', req.elements.map((s) => `${esc(ELEMENTS[s].name)} (${s})`).join(', ')]); // supported metals found
   if (req.candidates.length) rows.push(['Metal, estimate only', req.candidates.map((s) => `${esc(CANDIDATES[s].name)} (${s})`).join(', ')]); // estimate only metals found
   if (req.gases.length) rows.push(['Gas', req.gases.map((g) => `${esc(GASES[g].name)} (${label(g)})`).join(', ')]); // gases found
-  rows.push(['Question read by', source === 'model' ? 'language model' : 'built in reader']); // which reader was used, shown so users know how much to rely on it
+  rows.push([source === 'steps' ? 'Chosen with' : 'Question read by', source === 'model' ? 'language model' : source === 'steps' ? 'the step by step picker' : 'built in reader']); // which reader was used, shown so users know how much to rely on it
   return `<table class="kv"><tbody>${rows.map((r) => `<tr><th scope="row">${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</tbody></table>`; // a two column table
 }
 
@@ -171,28 +173,164 @@ function wireTooltip() { // shows the value of a bar when the pointer or keyboar
   });
 }
 
-async function ask(question) { // the whole flow from a question to an answer on screen
+function setStatus(text) { $('status').textContent = text; } // writes the progress line inside step four
+
+async function ask(question) { // the typed question path, from words to an answer on screen
   const q = question.trim(); // remove stray spaces
   if (!q) return; // ignore empty questions
-  $('status').textContent = 'Working on it...'; // tell the user something is happening
+  $('s4').classList.remove('locked'); // make sure step four is visible
+  setStatus('Working on it...'); // tell the user something is happening
   $('ask-btn').disabled = true; // prevent double submits
   const parsed = await callApi({ task: 'parse', question: q }); // try the language model reader first
   let req = parsed ? cleanRequest(parsed.request, q) : null; // validate what it returned
   const source = req ? 'model' : 'local'; // remember which reader produced the request
   if (!req) req = parseLocal(q); // fall back to the built in reader
+  await run(req, q, source, true); // show the answer and keep the steps in sync
+  $('ask-btn').disabled = false; // allow another question
+  saveRecent(q); // remember the question
+}
+
+async function run(req, q, source, sync) { // turns a structured request into everything on screen
+  if (sync) await syncFlow(req); // make the steps above show the same metal and gas
   const res = answer(req); // look up and compute the answer
   current = res; // remember it for the viewer
   const out = $('output'); // where the answer goes
   const explained = res.kind === 'help' ? null : await callApi({ task: 'explain', facts: facts(res) }); // ask the language model for a plain explanation
   const text = explained && explained.text ? explained.text : explainLocal(res); // use the built in explanation if there is none
   const inputs = await inputsBlock(res); // build the inputs panel if this answer has one
-  out.innerHTML = `<section class="panel"><h2>Your question</h2><p class="quote">${esc(q)}</p>${understood(req, source)}</section><section class="panel"><h2>Result</h2>${resultCard(res)}</section>${res.kind === 'help' ? '' : `<section class="panel"><h2>What this means</h2><p>${esc(text)}</p></section>`}${chartBlock(res)}${inputs}${notesBlock(res)}`; // draw every panel in order
+  const head = source === 'steps' ? `<section class="panel"><h2>Your choices</h2>${understood(req, source)}</section>` : `<section class="panel"><h2>Your question</h2><p class="quote">${esc(q)}</p>${understood(req, source)}</section>`; // choices for the picker, the question for typed input
+  out.innerHTML = `${head}<section class="panel"><h2>Result</h2>${resultCard(res)}</section>${res.kind === 'help' ? '' : `<section class="panel"><h2>What this means</h2><p>${esc(text)}</p></section>`}${chartBlock(res)}${inputs}${notesBlock(res)}`; // draw every panel in order
   out.hidden = false; // reveal the output area
-  $('status').textContent = ''; // clear the status line
-  $('ask-btn').disabled = false; // allow another question
+  $('s4').classList.remove('locked'); $('s4').classList.add('done'); // step four is available and finished
+  setStatus(''); // clear the status line
+  await drawSystem(); // show the 3D picture of the calculation when there is one
   wireInputs(); wireTooltip(); // attach the buttons and the tooltip
-  out.scrollIntoView({ behavior: 'smooth', block: 'start' }); // bring the answer into view
-  saveRecent(q); // remember the question
+  $('s4').scrollIntoView({ behavior: 'smooth', block: 'start' }); // bring the answer into view
+}
+
+// ---- the step by step picker: periodic table, surface viewer and gas cards ----
+
+const sel = { sym: null, gas: null, site: -1, slab: null }; // what the visitor has chosen so far
+let vSlab = null, vSys = null; // the two big viewers
+const vGas = {}; // the small molecule viewers, one per gas
+const PT_ROWS = { 2: ['Li', 'Be', null, null, null], 3: ['Na', 'Mg', null, 'Al', null], 4: ['K', 'Ca', 'Zn', 'Ga', null], 5: ['Rb', 'Sr', 'Cd', 'In', 'Sn'], 6: ['Cs', 'Ba', null, 'Tl', null] }; // element positions by period, columns are groups 1, 2, 12, 13 and 14
+const PT_HEAD = ['1', '2', '12', '13', '14']; // the group numbers over the columns
+
+function tileInfo(sym) { return ELEMENTS[sym] || CANDIDATES[sym]; } // facts about a tile's element from either list
+
+function buildTable() { // draws the mini periodic table
+  let html = '<span></span>' + PT_HEAD.map((g) => `<span class="hd">Group ${g}</span>`).join(''); // the header row
+  for (const [period, row] of Object.entries(PT_ROWS)) { // each period
+    html += `<span class="rl">Period ${period}</span>`; // the row label
+    for (const sym of row) { // each column
+      if (!sym) { html += '<span></span>'; continue; } // an empty cell where no element is shown
+      const info = tileInfo(sym); // its facts
+      const calc = Boolean(ELEMENTS[sym]); // true when a calculation exists
+      html += `<button type="button" class="tile${calc ? '' : ' est'}" data-sym="${sym}" aria-pressed="false" title="${esc(info.name)}, ${esc(info.family)}${calc ? '' : ', estimate only'}"><b>${sym}</b><small>${esc(info.name)}</small></button>`; // one tile
+    }
+  }
+  $('ptable').innerHTML = html; // put the table on the page
+  $('ptable').addEventListener('click', (e) => { const t = e.target.closest('.tile'); if (t) pickMetal(t.dataset.sym); }); // choose a metal when a tile is clicked
+}
+
+function layerCount(slab) { return new Set(slab.atoms.map((a) => a.z.toFixed(1))).size; } // the number of distinct heights, which is the number of layers
+
+async function pickMetal(sym, quiet) { // the visitor chose a metal, by tile or by typing
+  sel.sym = sym; sel.site = -1; sel.slab = null; // reset the dependent choices
+  document.querySelectorAll('.tile').forEach((t) => { const on = t.dataset.sym === sym; t.classList.toggle('on', on); t.setAttribute('aria-pressed', String(on)); }); // mark the chosen tile
+  const info = tileInfo(sym); // facts about the metal
+  $('s1').classList.add('done'); // step one is finished
+  $('s1-sum').textContent = `Selected: ${info.name} (${sym}), ${info.family}.`; // say what was chosen
+  $('s2').classList.remove('locked'); $('s3').classList.remove('locked'); // steps two and three open up
+  document.querySelectorAll('.gcard').forEach((c) => { c.disabled = false; }); // the gas cards can now be clicked
+  if (ELEMENTS[sym]) { // a metal with a calculated surface
+    const slab = await getSlab(sym); // read the real atoms
+    sel.slab = slab; sel.site = slab.topIndexes[0]; // start with the first top atom chosen
+    $('s2-body').hidden = false; // show the viewer
+    vSlab.setScene(slabScene(slab, sel.site)); vSlab.setView('angle'); // draw the surface at a friendly angle
+    $('slab-info').textContent = `${info.name} ${info.crystal}, ${info.face} surface: ${slab.atoms.length} atoms in ${layerCount(slab)} layers. The dashed box is the simulation cell and the faded atoms are its repeats.`; // describe what is shown
+    $('s2-sum').textContent = 'This is the surface the gas will land on, exactly as used in the calculation.'; // a line under the title
+    $('s2').classList.add('done'); // step two is finished
+  } else { // an estimate only metal
+    $('s2-body').hidden = true; // nothing to show
+    $('s2-sum').textContent = `There is no surface model for ${info.name} yet, so only a model estimate is possible.`; // explain why
+    $('s2').classList.add('done'); // nothing more to do here
+  }
+  $('s3-sum').textContent = 'Pick the gas that should land on the surface. Drag a molecule to turn it.'; // a line under the title
+  if (!quiet) { if (sel.gas) await pickGas(sel.gas); else $('s2').scrollIntoView({ behavior: 'smooth', block: 'start' }); } // rerun with the new metal, or move down to the surface
+}
+
+async function pickSite(id) { // the visitor clicked a top atom
+  if (id < 0 || !sel.slab) return; // ignore clicks that did not hit a top atom
+  sel.site = id; // remember it
+  vSlab.setScene(slabScene(sel.slab, id)); // move the highlight
+  if (current && current.kind === 'single') await drawSystem(); // move the gas in the result picture too
+}
+
+async function pickGas(g) { // the visitor chose a gas, by card or by typing
+  sel.gas = g; // remember it
+  document.querySelectorAll('.gcard').forEach((c) => c.classList.toggle('on', c.dataset.gas === g)); // mark the chosen card
+  $('s3').classList.add('done'); // step three is finished
+  $('s3-sum').textContent = `Selected: ${GASES[g].name} (${label(g)}).`; // say what was chosen
+  if (!sel.sym) return; // wait for a metal
+  const calc = Boolean(ELEMENTS[sel.sym]); // does a calculation exist
+  const req = { intent: calc ? 'single' : 'estimate', elements: calc ? [sel.sym] : [], candidates: calc ? [] : [sel.sym], gases: [g], unsupported: [], raw: '' }; // the same shape the typed path produces
+  $('s4').classList.remove('locked'); setStatus('Working on it...'); // open step four with a message
+  await run(req, '', 'steps', false); // show the answer
+}
+
+async function syncFlow(req) { // makes the steps match a typed question
+  const sym = req.elements.length === 1 ? req.elements[0] : req.candidates.length === 1 && !req.elements.length ? req.candidates[0] : null; // the single metal asked about, if any
+  if (sym && sym !== sel.sym) await pickMetal(sym, true); // show it in steps one and two
+  if (req.gases.length === 1) { // the single gas asked about, if any
+    sel.gas = req.gases[0]; // remember it
+    document.querySelectorAll('.gcard').forEach((c) => c.classList.toggle('on', c.dataset.gas === sel.gas)); // mark the card
+    $('s3').classList.add('done'); $('s3-sum').textContent = `Selected: ${GASES[sel.gas].name} (${label(sel.gas)}).`; // finish step three
+  }
+}
+
+async function drawSystem() { // draws the surface with the gas above it for single answers
+  const box = $('sysview'); // the result picture area
+  if (!current || current.kind !== 'single') { box.hidden = true; return; } // other answers have no picture
+  box.hidden = false; // show the area
+  const site = sel.slab && sel.sym === current.sym ? sel.site : -1; // the chosen top atom, or the first one by default
+  const sys = await getSystem(current.sym, current.gas, site); // build the real system
+  vSys.setScene(systemScene(sys)); vSys.setView('angle'); // draw it at a friendly angle
+  $('sys-info').textContent = `${GASES[current.gas].name} placed ${sys.height.toFixed(1)} Å above a top ${ELEMENTS[current.sym].name} atom, as in the calculation. The atoms were not relaxed. Red is oxygen, grey is carbon and yellow is sulfur.`; // say what the picture shows
+}
+
+async function buildGasCards() { // draws the three gas cards with spinning molecules
+  $('gascards').innerHTML = Object.keys(GASES).map((g) => `<button type="button" class="gcard" data-gas="${g}" disabled><canvas aria-hidden="true"></canvas><b>${esc(GASES[g].name)} (${label(g)})</b><span>${esc(GASES[g].note)}. Lands with its ${GASES[g].down} end down.</span></button>`).join(''); // one card per gas, locked until a metal is chosen
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches; // some people ask for no moving pictures
+  for (const g of Object.keys(GASES)) { // each gas
+    const cv = document.querySelector(`.gcard[data-gas="${g}"] canvas`); // its drawing surface
+    vGas[g] = new Viewer(cv, { yaw: 0.9, pitch: 0.5, fit: 0.9 }); // a small viewer
+    vGas[g].setScene(gasScene(await getGas(g))); // draw the real molecule
+    if (!calm) vGas[g].setSpin(true); // turn slowly unless motion is unwanted
+  }
+  $('gascards').addEventListener('click', (e) => { const c = e.target.closest('.gcard'); if (c && !c.disabled) pickGas(c.dataset.gas); }); // choose a gas when a card is clicked
+}
+
+function wireViewerTools() { // makes the Angle, Top, Side, zoom and spin buttons work
+  document.addEventListener('click', (e) => { // one listener for every tool button
+    const b = e.target.closest('.vtools [data-v]'); // the button that was clicked
+    if (!b) return; // not a tool button
+    const v = b.closest('.vwrap').querySelector('canvas').id === 'cv-slab' ? vSlab : vSys; // the viewer this toolbar belongs to
+    const what = b.dataset.v; // which action
+    if (what === 'in') v.zoomBy(1.2); // zoom in
+    else if (what === 'out') v.zoomBy(1 / 1.2); // zoom out
+    else if (what === 'spin') { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); v.setSpin(on); } // toggle the slow turning
+    else v.setView(what); // a preset angle
+  });
+}
+
+function buildFlow() { // sets up the whole step by step picker
+  buildTable(); // the periodic table
+  vSlab = new Viewer($('cv-slab'), { onPick: pickSite, fit: 0.82 }); // the surface viewer, clicks choose the landing atom
+  vSys = new Viewer($('cv-sys')); // the result viewer
+  wireViewerTools(); // the toolbar buttons
+  $('s2-next').addEventListener('click', () => $('s3').scrollIntoView({ behavior: 'smooth', block: 'start' })); // the Next button moves down to the gases
+  buildGasCards(); // the gas cards, drawn when their data arrives
 }
 
 function saveRecent(q) { // keeps the last few questions in this browser only
@@ -213,6 +351,7 @@ function renderRecent() { // shows the recent questions as links
 
 function init() { // runs once when the page loads
   initTheme(); // set up the light and dark switch
+  buildFlow(); // build the step by step picker
   $('examples').innerHTML = EXAMPLES.map((x) => `<button type="button" class="link" data-q="${esc(x)}">${esc(x)}</button>`).join(''); // example question buttons
   document.addEventListener('click', (e) => { // one listener for every question button
     const b = e.target.closest('[data-q]'); // the button that was clicked
