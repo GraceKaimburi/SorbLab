@@ -1,0 +1,199 @@
+/* style.css: the look of every page. Colours are defined once as variables, then swapped for dark mode. */
+
+:root { /* default (light) colour set */
+  color-scheme: light; /* tells the browser to draw form controls in light colours */
+  --bg: #f4f4f2; /* page background, a soft grey so white panels stand out */
+  --surface: #fcfcfb; /* panel and chart background */
+  --text: #0b0b0b; /* main text, near black for strong contrast */
+  --text-2: #52514e; /* secondary text for hints and descriptions */
+  --text-3: #6f6e69; /* quiet text such as axis labels */
+  --line: #dcdbd6; /* thin borders and grid lines */
+  --line-2: #c7c6c0; /* slightly stronger line, used for the zero line */
+  --accent: #1c5cab; /* links and the main button */
+  --accent-ink: #ffffff; /* text on the main button */
+  --bind: #2a78d6; /* bars and badges for negative energy, the gas binds */
+  --repel: #eb6834; /* bars and badges for positive energy, the gas does not bind */
+  --neutral: #8a8984; /* badges for values close to zero */
+  --warn-bg: #fff6e0; /* background of caution notes */
+  --warn-line: #eda100; /* edge of caution notes */
+  --info-bg: #eef4fc; /* background of information notes */
+  --info-line: #2a78d6; /* edge of information notes */
+  --code-bg: #f1f0ed; /* background of input file viewer */
+}
+
+@media (prefers-color-scheme: dark) { /* follow the computer's dark setting */
+  :root:not([data-theme="light"]) { /* unless the visitor chose light */
+    color-scheme: dark; /* dark form controls */
+    --bg: #121211; /* dark page background */
+    --surface: #1a1a19; /* dark panel background */
+    --text: #f0efec; /* light main text */
+    --text-2: #c3c2b7; /* light secondary text */
+    --text-3: #a3a29a; /* quiet text */
+    --line: #383835; /* dark borders */
+    --line-2: #55544f; /* stronger dark line */
+    --accent: #6da7ec; /* lighter link colour for contrast on dark */
+    --accent-ink: #0b0b0b; /* dark text on the light button */
+    --bind: #3987e5; /* bind colour stepped for the dark surface */
+    --repel: #d95926; /* repel colour stepped for the dark surface */
+    --neutral: #8a8984; /* neutral badge */
+    --warn-bg: #2b2412; /* dark caution background */
+    --warn-line: #c98500; /* dark caution edge */
+    --info-bg: #14202f; /* dark information background */
+    --info-line: #3987e5; /* dark information edge */
+    --code-bg: #232321; /* dark code background */
+  }
+}
+
+:root[data-theme="dark"] { /* the same dark set when the visitor picks dark with the button */
+  color-scheme: dark; /* dark form controls */
+  --bg: #121211; /* dark page background */
+  --surface: #1a1a19; /* dark panel background */
+  --text: #f0efec; /* light main text */
+  --text-2: #c3c2b7; /* light secondary text */
+  --text-3: #a3a29a; /* quiet text */
+  --line: #383835; /* dark borders */
+  --line-2: #55544f; /* stronger dark line */
+  --accent: #6da7ec; /* link colour */
+  --accent-ink: #0b0b0b; /* text on the button */
+  --bind: #3987e5; /* bind colour */
+  --repel: #d95926; /* repel colour */
+  --neutral: #8a8984; /* neutral badge */
+  --warn-bg: #2b2412; /* caution background */
+  --warn-line: #c98500; /* caution edge */
+  --info-bg: #14202f; /* information background */
+  --info-line: #3987e5; /* information edge */
+  --code-bg: #232321; /* code background */
+}
+
+* { box-sizing: border-box; } /* widths include padding and borders, which keeps layout arithmetic simple */
+
+html { -webkit-text-size-adjust: 100%; } /* stops phones from enlarging text on their own */
+
+body { /* the page itself */
+  margin: 0; /* remove the default outer space */
+  background: var(--bg); /* soft page colour */
+  color: var(--text); /* main text colour */
+  font: 16px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* a plain system font, size and line spacing */
+}
+
+a { color: var(--accent); } /* links use the accent colour */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible, .row:focus-visible, pre:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } /* a clear ring for keyboard users */
+
+.site-header { background: var(--surface); border-bottom: 1px solid var(--line); } /* the top bar */
+.bar { max-width: 960px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; flex-wrap: wrap; } /* centres the header content and spreads brand and menu apart */
+.brand { font-weight: 650; font-size: 18px; letter-spacing: 0.2px; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 10px; } /* the site name with its mark */
+.brand small { font-weight: 400; font-size: 13px; color: var(--text-2); } /* the tagline beside the name */
+.mark { width: 22px; height: 22px; } /* size of the logo mark */
+nav { display: flex; align-items: center; gap: 4px; } /* the menu row */
+nav a { padding: 18px 12px 16px; color: var(--text-2); text-decoration: none; border-bottom: 2px solid transparent; font-size: 15px; } /* menu links with a hidden underline slot */
+nav a:hover { color: var(--text); } /* darker on hover */
+nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; } /* the current page is underlined */
+#theme { background: none; border: 1px solid var(--line); color: var(--text-2); border-radius: 4px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 8px; } /* the light and dark switch */
+#theme:hover { color: var(--text); border-color: var(--line-2); } /* feedback on hover */
+
+main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; } /* the content column */
+h1 { font-size: 28px; line-height: 1.2; margin: 8px 0 8px; font-weight: 650; } /* page title */
+h2 { font-size: 18px; margin: 0 0 12px; font-weight: 650; } /* panel heading */
+h3 { font-size: 15px; margin: 20px 0 8px; font-weight: 650; } /* sub heading */
+p { margin: 0 0 12px; } /* paragraph spacing */
+.lead { color: var(--text-2); max-width: 70ch; margin-bottom: 20px; } /* the intro sentence under the title */
+.muted { color: var(--text-2); font-size: 14px; } /* small secondary text */
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; margin: 0 0 16px; } /* a white card holding one topic */
+.quote { font-size: 17px; margin: 0 0 12px; padding-left: 12px; border-left: 3px solid var(--line-2); } /* the user's own question repeated back */
+
+form.ask { display: flex; gap: 8px; margin: 0 0 8px; } /* the question box and button in one row */
+form.ask input { flex: 1; font: inherit; padding: 11px 12px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--text); min-width: 0; } /* the question box */
+.btn { font: inherit; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--text); cursor: pointer; } /* a standard button */
+.btn:hover { border-color: var(--text-3); } /* darker edge on hover */
+.btn.primary, form.ask .btn { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); } /* the main action */
+.btn:disabled { opacity: 0.6; cursor: default; } /* a busy button looks inactive */
+.examples, #recent { font-size: 14px; margin: 4px 0 0; line-height: 2; } /* the rows of example and recent questions */
+.link { background: none; border: 0; padding: 0; margin: 0 14px 0 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; text-align: left; } /* a button that looks like a link */
+#status { min-height: 24px; color: var(--text-2); font-size: 14px; margin: 8px 0; } /* the progress message line */
+
+table { border-collapse: collapse; width: 100%; font-size: 15px; } /* every table starts clean */
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; } /* row lines and cell space */
+thead th { font-size: 13px; color: var(--text-2); font-weight: 600; border-bottom: 1px solid var(--line-2); } /* column headings are small and quiet */
+.num { text-align: right; font-variant-numeric: tabular-nums; } /* numbers line up on their decimal point */
+table.kv th { width: 180px; color: var(--text-2); font-weight: 500; } /* label column of the key value table */
+table.kv th, table.kv td { border-bottom: 0; padding: 4px 10px 4px 0; } /* the key value table has no row lines */
+
+.figure { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; } /* big number beside its description */
+.fig-value { font-size: 52px; line-height: 1; font-weight: 600; letter-spacing: -1px; color: var(--text); font-variant-numeric: proportional-nums; } /* the one headline number, in normal text colour */
+.fig-value .unit { font-size: 20px; font-weight: 400; color: var(--text-2); letter-spacing: 0; } /* the unit is smaller */
+.fig-meta { display: grid; gap: 4px; } /* the lines beside the number */
+.fig-label { font-weight: 600; } /* what the number is */
+.fig-sub { color: var(--text-2); font-size: 14px; } /* supporting detail lines */
+
+.badge { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; width: fit-content; } /* a short status label */
+.badge::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--neutral); } /* the coloured dot carries the tone, the words carry the meaning */
+.badge.bind::before { background: var(--bind); } /* blue dot for binding */
+.badge.repel::before { background: var(--repel); } /* orange dot for not binding */
+
+.callout { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-left: 3px solid; border-radius: 3px; margin: 14px 0 0; font-size: 14px; } /* a note box with an icon */
+.callout .icon { flex: none; margin-top: 2px; } /* keeps the icon from shrinking */
+.callout.warn { background: var(--warn-bg); border-color: var(--warn-line); } /* caution colours */
+.callout.info { background: var(--info-bg); border-color: var(--info-line); } /* information colours */
+
+.legend { display: flex; gap: 18px; list-style: none; padding: 0; margin: 0 0 8px; font-size: 14px; color: var(--text-2); } /* the key above the chart */
+.legend li { display: flex; align-items: center; gap: 8px; } /* swatch beside its words */
+.swatch { width: 14px; height: 14px; border-radius: 3px; display: inline-block; } /* the colour sample */
+.swatch.bind { background: var(--bind); } /* blue sample */
+.swatch.repel { background: var(--repel); } /* orange sample */
+.chart { max-width: 680px; } /* the chart never grows wider than its design */
+.chart-svg { width: 100%; height: auto; display: block; } /* scales with the screen */
+.chart-svg .grid { stroke: var(--line); stroke-width: 1; } /* hairline vertical grid */
+.chart-svg .zero { stroke: var(--line-2); stroke-width: 1; } /* the baseline all bars grow from */
+.chart-svg .tick, .chart-svg .axis-title { fill: var(--text-3); font-size: 11px; } /* axis text in a quiet colour */
+.chart-svg .sym { fill: var(--text-2); font-size: 13px; } /* element symbols in text colour, never in the bar colour */
+.chart-svg .row.sel .sym { fill: var(--text); font-weight: 700; } /* the chosen metal is darker and bolder */
+.chart-svg .val { fill: var(--text); font-size: 12px; font-weight: 600; } /* the few value labels */
+.chart-svg .hit { fill: transparent; } /* invisible but still catches the pointer */
+.chart-svg .row { outline: none; cursor: default; } /* focus ring is drawn by the row below */
+.chart-svg .row:hover .hit, .chart-svg .row:focus .hit { fill: var(--line); opacity: 0.35; } /* a light band marks the row under the pointer */
+.chart-svg .bar.bind { fill: var(--bind); } /* blue bars */
+.chart-svg .bar.repel { fill: var(--repel); } /* orange bars */
+.chart-svg .bar.dim { opacity: 0.45; } /* the other bars step back when one metal is chosen */
+#tip { position: absolute; z-index: 5; background: var(--text); color: var(--bg); padding: 6px 10px; border-radius: 4px; font-size: 13px; pointer-events: none; line-height: 1.4; } /* the hover box */
+.tableview { margin-top: 12px; } /* space above the table toggle */
+.tableview summary { cursor: pointer; color: var(--accent); font-size: 14px; } /* the clickable summary line */
+
+.field { display: grid; gap: 4px; margin: 8px 0 12px; max-width: 460px; } /* a label above an input */
+.field label { font-size: 13px; color: var(--text-2); } /* the small label */
+.field input { font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--text); font-family: ui-monospace, Consolas, monospace; } /* the path box */
+.tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); } /* the row of file tabs */
+.tab { font: inherit; font-size: 14px; background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; color: var(--text-2); cursor: pointer; } /* an inactive tab */
+.tab.on { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; } /* the active tab */
+.fileinfo { font-size: 13px; color: var(--text-2); margin: 10px 0 6px; } /* one line about the open file */
+pre.code { background: var(--code-bg); border: 1px solid var(--line); border-radius: 4px; padding: 12px; margin: 0 0 12px; max-height: 320px; overflow: auto; font: 12.5px/1.45 ui-monospace, Consolas, monospace; } /* the scrolling file viewer */
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; } /* the row of file buttons */
+ol.steps, ul.plain { margin: 0 0 8px 20px; padding: 0; } /* indented lists */
+ol.steps li, ul.plain li { margin-bottom: 6px; } /* spacing between items */
+code { font: 13px ui-monospace, Consolas, monospace; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; } /* inline code */
+
+.site-footer { max-width: 960px; margin: 0 auto; padding: 0 16px 32px; font-size: 13px; color: var(--text-2); } /* the page footer */
+
+.story { max-width: 70ch; } /* help page text column is narrower for easier reading */
+.story .step { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 0; border-top: 1px solid var(--line); } /* a numbered help step */
+.story .step:first-of-type { border-top: 0; } /* no line above the first step */
+.story .n { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; } /* the number badge */
+.story .step h3 { margin: 2px 0 6px; font-size: 17px; } /* step title */
+.story .like { background: var(--info-bg); border-left: 3px solid var(--info-line); padding: 8px 12px; margin: 8px 0 0; font-size: 15px; } /* the little picture in words for each step */
+.story dl { margin: 0; } /* glossary list */
+.story dt { font-weight: 650; margin-top: 12px; } /* the word being explained */
+.story dd { margin: 2px 0 0; color: var(--text-2); } /* its simple meaning */
+
+@media (max-width: 600px) { /* small screens */
+  h1 { font-size: 24px; } /* a smaller title */
+  .fig-value { font-size: 42px; } /* a smaller headline number */
+  form.ask { flex-direction: column; } /* stack the question box over the button */
+  nav a { padding: 12px 8px; } /* tighter menu */
+  table.kv th { width: 120px; } /* narrower label column */
+}
+
+.controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin: 0 0 12px; } /* the row of table controls */
+.controls label { display: grid; gap: 4px; font-size: 13px; color: var(--text-2); } /* a label above a select box */
+.controls select { font: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--text); } /* a select box */
+.tablewrap { overflow-x: auto; } /* wide tables scroll sideways on small screens instead of breaking the layout */
+.warnmark { color: #c98500; display: inline-flex; vertical-align: middle; cursor: help; } /* the caution icon next to a flagged value */

@@ -1,0 +1,159 @@
+<!DOCTYPE html> <!-- tells the browser this is a modern HTML page -->
+<html lang="en"> <!-- the page language -->
+<head> <!-- information about the page that is not shown on it -->
+  <meta charset="utf-8"> <!-- lets the page show special characters -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- makes the page fit phone screens -->
+  <title>Help: SorbLab</title> <!-- the text on the browser tab -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l8.5 5v10L12 22l-8.5-5V7z' fill='none' stroke='%231c5cab' stroke-width='2'/%3E%3C/svg%3E"> <!-- a small hexagon tab icon drawn inline so no extra file is needed -->
+  <link rel="stylesheet" href="css/style.css"> <!-- loads the look of the page -->
+</head>
+<body> <!-- everything the visitor sees -->
+  <header class="site-header"> <!-- the top bar -->
+    <div class="bar"> <!-- keeps the header content centred -->
+      <a class="brand" href="index.html"> <!-- the name doubles as a link home -->
+        <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" aria-hidden="true"> <!-- the logo mark -->
+          <path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/> <!-- the outer hexagon -->
+          <circle cx="12" cy="12" r="2.6"/> <!-- an atom in the middle -->
+        </svg> <!-- end of the logo mark -->
+        <span>SorbLab <small>gas adsorption on metals</small></span> <!-- the product name and what it does -->
+      </a> <!-- end of the brand link -->
+      <nav aria-label="Main"> <!-- the menu -->
+        <a href="index.html">Assistant</a> <!-- the question page -->
+        <a href="results.html">Results</a> <!-- the table of numbers -->
+        <a href="help.html" aria-current="page">Help</a> <!-- this page, marked as current -->
+        <button id="theme" type="button" aria-label="Switch theme"></button> <!-- the light and dark switch -->
+      </nav> <!-- end of the menu -->
+    </div> <!-- end of the centred header content -->
+  </header> <!-- end of the top bar -->
+
+  <main class="story"> <!-- the main content, a narrower column for easy reading -->
+    <h1>Help: what this tool does, step by step</h1> <!-- the page title -->
+    <p class="lead">This page explains everything in the simplest words we can find. If you can read a picture book, you can follow it. Each step has a small picture in words.</p> <!-- sets the tone and promises simplicity -->
+
+    <div class="step"> <!-- step one -->
+      <div class="n">1</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>What is this for?</h3> <!-- step title -->
+        <p>Some gases are bad for the air. Cars, factories and power stations make them. We would like a material that grabs these gases and holds on, so they do not float away into the sky.</p> <!-- the reason the tool exists -->
+        <p>This tool tells you how well different metals can grab three gases: carbon dioxide (CO&#8322;), carbon monoxide (CO) and sulfur dioxide (SO&#8322;).</p> <!-- what the tool answers -->
+        <p class="like">Picture it: a sticky hand. Some metals are very sticky. Some are not sticky at all. We measure the stickiness.</p> <!-- the picture in words -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step one -->
+
+    <div class="step"> <!-- step two -->
+      <div class="n">2</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>What is a metal, and what is a gas?</h3> <!-- step title -->
+        <p>Everything is made of tiny, tiny balls called atoms. They are far too small to see. A piece of metal is millions and millions of the same ball, stacked neatly like marbles in a box. We use a flat top layer of that stack and call it the surface.</p> <!-- explains metal and surface -->
+        <p>A gas is a little group of balls that is flying around in the air. CO&#8322; has one carbon ball in the middle and two oxygen balls on the sides. SO&#8322; has one sulfur ball with two oxygen balls, bent like a letter V.</p> <!-- explains the gas molecules -->
+        <p class="like">Picture it: a marble wall (the metal) and a few tiny insects (the gas) flying toward it.</p> <!-- the picture in words -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step two -->
+
+    <div class="step"> <!-- step three -->
+      <div class="n">3</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>Does it stick or bounce?</h3> <!-- step title -->
+        <p>When the gas touches the wall, one of two things happens. It sticks, or it bounces away. We find out by asking: is the gas happier on the wall, or happier in the air?</p> <!-- the central question -->
+        <p>We write the answer as one number called the adsorption energy. It is measured in eV, short for electronvolt, which is just a tiny unit of energy.</p> <!-- introduces the number and its unit -->
+        <p class="like">Picture it: a ball and a bowl. If the ball rolls into the bowl and stays, it is happy there. That is a <strong>negative</strong> number, and the gas <strong>sticks</strong>. If the ball is sitting on top of a hill, it rolls off. That is a <strong>positive</strong> number, and the gas does <strong>not stick</strong>. The more negative the number, the deeper the bowl, and the harder it is to pull the gas off.</p> <!-- the main picture in words -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step three -->
+
+    <div class="step"> <!-- step four -->
+      <div class="n">4</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>How do we get the number?</h3> <!-- step title -->
+        <p>We ask a computer to work it out. We cannot measure the stickiness of every metal in a lab, because that takes a long time and costs a lot. The computer program is called Quantum ESPRESSO. It pretends to be all the tiny electrons that hold the atoms together and finds the energy.</p> <!-- why a computer is used -->
+        <p>The computer does three little sums, and each sum gives an energy:</p> <!-- introduces the three runs -->
+        <ol class="steps"> <!-- the three runs in order -->
+          <li>The wall with the gas just above it.</li> <!-- the combined system -->
+          <li>The wall by itself.</li> <!-- the surface alone -->
+          <li>The gas by itself, in an empty box.</li> <!-- the gas alone -->
+        </ol> <!-- end of the list -->
+        <p>Then it takes the first energy and subtracts the other two. What is left over is how much the wall and the gas like each other. That is the adsorption energy.</p> <!-- the subtraction -->
+        <p class="like">Picture it: weigh the wall and the toy together. Then weigh the wall alone, and the toy alone. If the first is lighter than the other two added up, they like being together.</p> <!-- the picture in words, loosely like an energy balance -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step four -->
+
+    <div class="step"> <!-- step five -->
+      <div class="n">5</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>How to use the assistant</h3> <!-- step title -->
+        <ol class="steps"> <!-- the usage steps -->
+          <li>Go to the <a href="index.html">Assistant</a> page.</li> <!-- go to the tool -->
+          <li>Type a question in plain words, such as <em>How strongly does SO2 stick to calcium?</em> Or press one of the example questions.</li> <!-- ask -->
+          <li>Press <strong>Ask</strong>.</li> <!-- submit -->
+          <li>Read the big number. A negative number means the gas sticks.</li> <!-- read the result -->
+          <li>Read <strong>What this means</strong>. It says the same thing in a few easy sentences.</li> <!-- read the explanation -->
+          <li>Look at the bar picture. It shows your metal next to the other eleven. Blue bars stick, orange bars do not.</li> <!-- read the chart -->
+          <li>If you want to repeat the calculation yourself, download the files under <strong>Simulation inputs</strong>.</li> <!-- get the files -->
+        </ol> <!-- end of the list -->
+        <p>Try one now:</p> <!-- invitation to try -->
+        <p><a href="index.html?q=How%20strongly%20does%20SO2%20stick%20to%20calcium%3F">How strongly does SO2 stick to calcium?</a><br><a href="index.html?q=Which%20metal%20binds%20carbon%20dioxide%20best%3F">Which metal binds carbon dioxide best?</a><br><a href="index.html?q=Compare%20Mg%20and%20Al%20for%20CO">Compare Mg and Al for CO</a></p> <!-- three example links that open the assistant with the question already asked -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step five -->
+
+    <div class="step"> <!-- step six -->
+      <div class="n">6</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>What happens inside when you press Ask</h3> <!-- step title -->
+        <p>Here is the logic, in the order it happens.</p> <!-- introduction -->
+        <ol class="steps"> <!-- the internal steps -->
+          <li><strong>Read.</strong> A reader picks out the metal and the gas from your words. If a language model is switched on, it does the reading. If not, a simple built in reader looks for names such as calcium or the symbol Ca. The page always tells you which one read your question.</li> <!-- reading the question -->
+          <li><strong>Look up.</strong> The tool opens its notebook of finished calculations and finds your metal and gas.</li> <!-- looking up the number -->
+          <li><strong>Guess, only if needed.</strong> If your metal is not in the notebook, a small model makes a rough guess from two facts about the metal, how much it pulls on electrons and how big its atoms are. The page marks guesses clearly and says how wrong such guesses usually are. Like guessing a new child's height from the heights of the other children.</li> <!-- the estimate model -->
+          <li><strong>Write the recipe cards.</strong> For calculated metals, the tool gives you the three input files, which are the recipe cards the computer reads, plus a small script that runs them in order and does the subtraction.</li> <!-- the input files -->
+          <li><strong>Explain.</strong> The tool writes a short explanation that uses only the numbers it found. It does not make up new numbers.</li> <!-- the explanation -->
+        </ol> <!-- end of the list -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step six -->
+
+    <div class="step"> <!-- step seven -->
+      <div class="n">7</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>How much should you trust a number?</h3> <!-- step title -->
+        <ul class="plain"> <!-- trust guidance -->
+          <li>Calculated numbers are the most reliable thing on this site, but they are still approximations. A difference smaller than about 0.05 eV is too small to tell apart.</li> <!-- precision limit -->
+          <li>Guesses from the small model are only a rough guide. The <a href="results.html">Results</a> page shows how often they miss. For CO&#8322; the guess is fairly good. For CO and SO&#8322; it is poor.</li> <!-- model quality -->
+          <li>A warning triangle means a number is still being checked, because it looks unusual.</li> <!-- flagged values -->
+        </ul> <!-- end of the list -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step seven -->
+
+    <div class="step"> <!-- step eight -->
+      <div class="n">8</div> <!-- the step number -->
+      <div> <!-- the step text -->
+        <h3>What this tool cannot do yet</h3> <!-- step title -->
+        <ul class="plain"> <!-- the limits -->
+          <li>It covers twelve metals and three gases only.</li> <!-- coverage -->
+          <li>The metals are clean, flat surfaces. Real metals outside a laboratory are usually covered by a thin crust of oxide, which changes how gases stick.</li> <!-- clean surfaces -->
+          <li>The gas was placed at a fixed height above one spot and was not allowed to move closer to its best position, so the numbers are not fully relaxed.</li> <!-- fixed geometry -->
+          <li>The calculations leave out the weak pull between all atoms called dispersion. Adding it usually makes binding look stronger.</li> <!-- missing dispersion -->
+          <li>It does not yet cover porous materials such as the MOFs used to capture gases in practice. That is the next step of the project.</li> <!-- not MOFs yet -->
+        </ul> <!-- end of the list -->
+      </div> <!-- end of the step text -->
+    </div> <!-- end of step eight -->
+
+    <h2>Words you might meet</h2> <!-- glossary heading -->
+    <dl> <!-- the glossary -->
+      <dt>Adsorption</dt><dd>A gas sticking to the outside of a material. It is not the same as absorption, where it soaks inside.</dd> <!-- adsorption -->
+      <dt>eV (electronvolt)</dt><dd>A very small unit of energy, used for atoms. About 96.5 kJ per mol.</dd> <!-- eV -->
+      <dt>kJ per mol</dt><dd>Energy for a big pile of molecules at once. This is the unit most laboratory measurements use.</dd> <!-- kJ per mol -->
+      <dt>Å (angstrom)</dt><dd>A tiny length. One angstrom is one ten billionth of a metre. Atoms are about one to three angstroms wide.</dd> <!-- angstrom -->
+      <dt>DFT (density functional theory)</dt><dd>The method the computer uses to find the energy from the electrons.</dd> <!-- DFT -->
+      <dt>PBE</dt><dd>A common rule of thumb inside DFT for how electrons push on each other.</dd> <!-- PBE -->
+      <dt>Slab</dt><dd>A thin flat piece of metal used to stand for a surface, with empty space above and below it.</dd> <!-- slab -->
+      <dt>Cutoff (Ry)</dt><dd>How fine the computer's description of the electrons is. Higher is more careful and slower. Ry is a unit of energy, the Rydberg.</dd> <!-- cutoff -->
+      <dt>k points</dt><dd>How many places in the repeating piece of metal the computer checks. More points is more careful and slower.</dd> <!-- k points -->
+      <dt>Input file</dt><dd>The recipe card the computer reads: which atoms, where they sit, and how carefully to work.</dd> <!-- input file -->
+    </dl> <!-- end of the glossary -->
+  </main> <!-- end of the main content -->
+
+  <footer class="site-footer"><p>Ready? Go to the <a href="index.html">assistant</a>, or see all numbers on the <a href="results.html">results page</a>.</p></footer> <!-- links to the other pages -->
+  <script type="module"> /* a tiny script, only for the theme switch */
+    import { initTheme } from './js/theme.js'; // loads the shared theme code
+    initTheme(); // sets up the light and dark button
+  </script> <!-- end of the script -->
+</body> <!-- end of the visible page -->
+</html> <!-- end of the document -->

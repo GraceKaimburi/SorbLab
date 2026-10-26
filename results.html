@@ -1,0 +1,82 @@
+<!DOCTYPE html> <!-- tells the browser this is a modern HTML page -->
+<html lang="en"> <!-- the page language -->
+<head> <!-- information about the page that is not shown on it -->
+  <meta charset="utf-8"> <!-- lets the page show special characters -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- makes the page fit phone screens -->
+  <title>Results: SorbLab</title> <!-- the text on the browser tab -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l8.5 5v10L12 22l-8.5-5V7z' fill='none' stroke='%231c5cab' stroke-width='2'/%3E%3C/svg%3E"> <!-- a small hexagon tab icon drawn inline so no extra file is needed -->
+  <link rel="stylesheet" href="css/style.css"> <!-- loads the look of the page -->
+</head>
+<body> <!-- everything the visitor sees -->
+  <header class="site-header"> <!-- the top bar -->
+    <div class="bar"> <!-- keeps the header content centred -->
+      <a class="brand" href="index.html"> <!-- the name doubles as a link home -->
+        <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" aria-hidden="true"> <!-- the logo mark -->
+          <path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/> <!-- the outer hexagon -->
+          <circle cx="12" cy="12" r="2.6"/> <!-- an atom in the middle -->
+        </svg> <!-- end of the logo mark -->
+        <span>SorbLab <small>gas adsorption on metals</small></span> <!-- the product name and what it does -->
+      </a> <!-- end of the brand link -->
+      <nav aria-label="Main"> <!-- the menu -->
+        <a href="index.html">Assistant</a> <!-- the question page -->
+        <a href="results.html" aria-current="page">Results</a> <!-- this page, marked as current -->
+        <a href="help.html">Help</a> <!-- the step by step guide -->
+        <button id="theme" type="button" aria-label="Switch theme"></button> <!-- the light and dark switch -->
+      </nav> <!-- end of the menu -->
+    </div> <!-- end of the centred header content -->
+  </header> <!-- end of the top bar -->
+
+  <main> <!-- the main content -->
+    <h1>Results</h1> <!-- the page title -->
+    <p class="lead">Adsorption energy of CO&#8322;, CO and SO&#8322; on twelve metal surfaces. A negative number means the gas sticks; a positive number means it does not.</p> <!-- what the table shows and how to read the sign -->
+
+    <section class="panel"> <!-- the main table panel -->
+      <h2>Calculated adsorption energies</h2> <!-- panel heading -->
+      <div class="controls"> <!-- the table controls -->
+        <label>Sort by <!-- label for the sort box -->
+          <select id="sort"> <!-- the sort choices -->
+            <option value="family">Group of the periodic table</option> <!-- the original order -->
+            <option value="CO2">CO2, strongest binding first</option> <!-- sort by CO2 -->
+            <option value="CO">CO, strongest binding first</option> <!-- sort by CO -->
+            <option value="SO2">SO2, strongest binding first</option> <!-- sort by SO2 -->
+          </select> <!-- end of the sort choices -->
+        </label> <!-- end of the sort label -->
+        <label>Units <!-- label for the unit box -->
+          <select id="unit"> <!-- the unit choices -->
+            <option value="eV">electronvolts (eV)</option> <!-- the unit the calculations print -->
+            <option value="kJ">kilojoules per mole (kJ per mol)</option> <!-- the unit experiments usually report -->
+          </select> <!-- end of the unit choices -->
+        </label> <!-- end of the unit label -->
+        <button class="btn" id="csv" type="button">Download as CSV</button> <!-- saves the data for use in a spreadsheet -->
+      </div> <!-- end of the controls -->
+      <div class="tablewrap"> <!-- lets the table scroll sideways on small screens -->
+        <table class="data"> <!-- the results table -->
+          <thead><tr><th>Metal</th><th>Symbol</th><th>Group</th><th class="num">CO&#8322;</th><th class="num">CO</th><th class="num">SO&#8322;</th></tr></thead> <!-- column headings -->
+          <tbody id="table-body"></tbody> <!-- rows are added by the script -->
+        </table> <!-- end of the table -->
+      </div> <!-- end of the scroll wrapper -->
+      <p class="muted">Unit shown: <span id="unit-head">eV</span>. The warning triangle marks a value that is still being checked.</p> <!-- reminds which unit is on screen -->
+    </section> <!-- end of the main table panel -->
+
+    <section class="panel"> <!-- the settings panel -->
+      <h2>How the numbers were calculated</h2> <!-- panel heading -->
+      <table class="kv"><tbody id="settings"></tbody></table> <!-- the settings list is filled by the script -->
+      <p class="muted" id="reference"></p> <!-- the measured reference value is added by the script -->
+    </section> <!-- end of the settings panel -->
+
+    <section class="panel"> <!-- the model quality panel -->
+      <h2>How good is the estimate model?</h2> <!-- panel heading -->
+      <p class="muted">For metals with no calculation, the assistant gives a rough estimate from electronegativity and atom size. To test it, each of the twelve metals was hidden in turn and predicted from the other eleven. The typical miss, in eV, is below.</p> <!-- explains the test -->
+      <div class="tablewrap"> <!-- scroll wrapper -->
+        <table class="data"> <!-- the quality table -->
+          <thead><tr><th>Gas</th><th class="num">Model miss (eV)</th><th class="num">Guessing the average (eV)</th><th>Verdict</th></tr></thead> <!-- column headings -->
+          <tbody id="model-body"></tbody> <!-- rows are added by the script -->
+        </table> <!-- end of the quality table -->
+      </div> <!-- end of the scroll wrapper -->
+    </section> <!-- end of the model quality panel -->
+  </main> <!-- end of the main content -->
+
+  <footer class="site-footer"><p>Back to the <a href="index.html">assistant</a> or read the <a href="help.html">help page</a>.</p></footer> <!-- links to the other pages -->
+  <script type="module" src="js/results.js"></script> <!-- loads the page logic -->
+</body> <!-- end of the visible page -->
+</html> <!-- end of the document -->

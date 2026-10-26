@@ -1,0 +1,13 @@
+{
+  "name": "sorblab",
+  "version": "1.0.0",
+  "description": "Gas on metal surface binding energies from DFT, with a question reader, a small surrogate model and simulation input generator.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "test": "node tests/engine.test.mjs && node tests/api.test.mjs"
+  },
+  "engines": { "node": ">=18" }
+}

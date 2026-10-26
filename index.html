@@ -1,0 +1,53 @@
+<!DOCTYPE html> <!-- tells the browser this is a modern HTML page -->
+<html lang="en"> <!-- the page language, used by screen readers -->
+<head> <!-- information about the page that is not shown on it -->
+  <meta charset="utf-8"> <!-- lets the page show special characters such as the angstrom sign -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- makes the page fit phone screens -->
+  <title>SorbLab: gas adsorption on metals</title> <!-- the text on the browser tab -->
+  <meta name="description" content="Ask how strongly CO2, CO or SO2 sticks to a metal surface. Get the calculated energy, a plain explanation and ready to run simulation inputs."> <!-- the summary search engines show -->
+  <link rel="stylesheet" href="css/style.css"> <!-- loads the look of the page -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l8.5 5v10L12 22l-8.5-5V7z' fill='none' stroke='%231c5cab' stroke-width='2'/%3E%3C/svg%3E"> <!-- a small hexagon tab icon drawn inline so no extra file is needed -->
+</head>
+<body> <!-- everything the visitor sees -->
+  <header class="site-header"> <!-- the top bar -->
+    <div class="bar"> <!-- keeps the header content centred -->
+      <a class="brand" href="index.html"> <!-- the name doubles as a link home -->
+        <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" aria-hidden="true"> <!-- the logo mark, a hexagon like an atom lattice -->
+          <path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/> <!-- the outer hexagon -->
+          <circle cx="12" cy="12" r="2.6"/> <!-- an atom in the middle -->
+        </svg> <!-- end of the logo mark -->
+        <span>SorbLab <small>gas adsorption on metals</small></span> <!-- the product name and what it does -->
+      </a> <!-- end of the brand link -->
+      <nav aria-label="Main"> <!-- the menu -->
+        <a href="index.html" aria-current="page">Assistant</a> <!-- this page, marked as current -->
+        <a href="results.html">Results</a> <!-- the full table of numbers -->
+        <a href="help.html">Help</a> <!-- the step by step guide -->
+        <button id="theme" type="button" aria-label="Switch theme"></button> <!-- the light and dark switch, its icon is added by the script -->
+      </nav> <!-- end of the menu -->
+    </div> <!-- end of the centred header content -->
+  </header> <!-- end of the top bar -->
+
+  <main> <!-- the main content of the page -->
+    <h1>Adsorption assistant</h1> <!-- the page title -->
+    <p class="lead">Ask how strongly CO&#8322;, CO or SO&#8322; sticks to a metal surface. You get the calculated energy, a plain explanation, and the simulation files to reproduce it.</p> <!-- one sentence saying what the tool does -->
+
+    <form class="ask" id="ask-form" autocomplete="off"> <!-- the question form -->
+      <input id="question" type="text" maxlength="500" placeholder="For example: How strongly does SO2 stick to calcium?" aria-label="Your question" required> <!-- the box where the question is typed -->
+      <button class="btn" id="ask-btn" type="submit"><svg class="icon" viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2L17 17"/></svg><span>Ask</span></button> <!-- the submit button with a magnifying glass -->
+    </form> <!-- end of the form -->
+    <div class="examples" id="examples"></div> <!-- example questions are placed here by the script -->
+    <div id="recent"></div> <!-- the last few questions are placed here by the script -->
+    <div id="status" role="status" aria-live="polite"></div> <!-- progress messages, read aloud by screen readers -->
+
+    <div id="output" hidden></div> <!-- the answer panels appear here -->
+    <noscript><p class="panel">This page needs JavaScript to answer questions. The <a href="results.html">results page</a> works without it.</p></noscript> <!-- a message for visitors with scripts turned off -->
+  </main> <!-- end of the main content -->
+
+  <footer class="site-footer"> <!-- the page footer -->
+    <p>Energies come from density functional theory calculations with Quantum ESPRESSO (PBE, no dispersion correction). New to this? Read the <a href="help.html">help page</a>. Code and data are open on GitHub.</p> <!-- where the numbers come from and where to learn more -->
+  </footer> <!-- end of the footer -->
+
+  <div id="tip" hidden></div> <!-- the hover box for chart bars -->
+  <script type="module" src="js/app.js"></script> <!-- loads the page logic as a module -->
+</body> <!-- end of the visible page -->
+</html> <!-- end of the document -->
